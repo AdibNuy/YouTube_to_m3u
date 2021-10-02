@@ -2,4 +2,4 @@
 ~~ FORMAT: <channel name> | <group name> | <logo> | <tvg-id>
 
  |  |  |
-https://www.youtube.com/watch?v=xtiWQbt3CU0&ab_channel=Naimat
+https://www.youtube.com/watch?v=nWcU3qMnokQ&ab_channel=Naimat
