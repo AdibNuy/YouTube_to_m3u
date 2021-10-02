@@ -1,16 +1,5 @@
 #! /usr/bin/python3
 
-banner = r'''
-#########################################################################
-#      ____            _           _   __  __                           #
-#     |  _ \ _ __ ___ (_) ___  ___| |_|  \/  | ___   ___  ___  ___      #
-#     | |_) | '__/ _ \| |/ _ \/ __| __| |\/| |/ _ \ / _ \/ __|/ _ \     #
-#     |  __/| | | (_) | |  __/ (__| |_| |  | | (_) | (_) \__ \  __/     #
-#     |_|   |_|  \___// |\___|\___|\__|_|  |_|\___/ \___/|___/\___|     #
-#                   |__/                                                #
-#                                  >> https://github.com/benmoose39     #
-#########################################################################
-'''
 
 import requests
 import os
@@ -21,18 +10,16 @@ if 'win' in sys.platform:
     windows = True
 
 def grab(url):
-    response = requests.get(url, timeout=15).text
+    response = s.get(url, timeout=15).text
     if '.m3u8' not in response:
-        #response = requests.get(url).text
+        if windows:
+            print('https://raw.githubusercontent.com/benmoose39/YouTube_to_m3u/main/assets/moose_na.m3u')
+            return
+        os.system(f'wget {url} -O temp.txt')
+        response = ''.join(open('temp.txt').readlines())
         if '.m3u8' not in response:
-            if windows:
-                print('https://raw.githubusercontent.com/benmoose39/YouTube_to_m3u/main/assets/moose_na.m3u')
-                return
-            os.system(f'wget {url} -O temp.txt')
-            response = ''.join(open('temp.txt').readlines())
-            if '.m3u8' not in response:
-                print('https://raw.githubusercontent.com/benmoose39/YouTube_to_m3u/main/assets/moose_na.m3u')
-                return
+            print('https://raw.githubusercontent.com/benmoose39/YouTube_to_m3u/main/assets/moose_na.m3u')
+            return
     end = response.find('.m3u8') + 5
     tuner = 100
     while True:
@@ -43,11 +30,16 @@ def grab(url):
             break
         else:
             tuner += 5
-    print(f"{link[start : end]}")
+    streams = s.get(link[start:end]).text.split('#EXT')
+    hd = streams[-1].strip()
+    st = hd.find('http')
+    print(hd[st:].strip())
+    #print(f"{link[start : end]}")
 
-print('#EXTM3U x-tvg-url="https://github.com/botallen/epg/releases/download/latest/epg.xml"')
-print(banner)
-#s = requests.Session()
+print('#EXTM3U')
+print('#EXT-X-VERSION:3')
+print('#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=2560000')
+s = requests.Session()
 with open('../youtube_channel_info.txt') as f:
     for line in f:
         line = line.strip()
@@ -59,7 +51,6 @@ with open('../youtube_channel_info.txt') as f:
             grp_title = line[1].strip().title()
             tvg_logo = line[2].strip()
             tvg_id = line[3].strip()
-            print(f'\n#EXTINF:-1 group-title="{grp_title}" tvg-logo="{tvg_logo}" tvg-id="{tvg_id}", {ch_name}')
         else:
             grab(line)
             
